@@ -1,3 +1,4 @@
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 
@@ -40,6 +41,11 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   TextEditingController _nameController = TextEditingController();
   bool _nameSet = false;
   bool _typeSet = false;
+  final int happinessThreshold = 10;
+final int hungerThreshold = 10;
+final int healthThreshold = 10;
+bool hasRunAway = false;
+
 
   bool _overfedWarningShown = false;
   bool _starvedWarningShown = false;
@@ -150,6 +156,7 @@ void _playWithPet(String playType) {
         _resetWarningsIfNeeded();
         _checkHappinessWarning();
       });
+      checkRunAwayStatus(); // Add this line to check runaway conditions
     });
 
     energyTimer = Timer.periodic(const Duration(seconds: 60), (Timer timer) {
@@ -160,6 +167,7 @@ void _playWithPet(String playType) {
           energyLevel = 100; // Reset energy after warning
         }
       });
+      checkRunAwayStatus(); // Add this line to check runaway conditions
     });
   }
 
@@ -192,6 +200,27 @@ void _updateHealthDueToHunger() {
 void _updateHealth() {
   healthLevel = (hungerLevel).clamp(0, 100); // Health is equal to hunger level
 }
+void checkRunAwayStatus() {
+  if (happinessLevel <= happinessThreshold || hungerLevel <= hungerThreshold || healthLevel <= healthThreshold) {
+    setState(() {
+      hasRunAway = true;
+    });
+    _showRunAwayDialog();
+  }
+}
+void resetPet() {
+  setState(() {
+    petName = "Your Pet";
+    happinessLevel = 60;
+    hungerLevel = 50;
+    energyLevel = 100;
+    healthLevel = 100;
+    coins = 100;
+    hasRunAway = false;
+  });
+}
+
+
 
 
   void _showOverfedWarning() {
@@ -245,6 +274,27 @@ void _updateHealth() {
       },
     );
   }
+  void _showRunAwayDialog() {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Your Pet Ran Away!'),
+        content: const Text('Your pet has run away due to low happiness, hunger, or health.'),
+        actions: <Widget>[
+          ElevatedButton(
+            child: const Text('Reset'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              resetPet();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   Widget _petTypeSelectionScreen() {
     return Scaffold(
@@ -565,6 +615,26 @@ void _letPetSleep() {
 
 @override
 Widget build(BuildContext context) {
+  if (hasRunAway) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Your pet has run away!',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: resetPet,
+              child: const Text('Restart'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
   if (!_nameSet) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 179, 214),
