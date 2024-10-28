@@ -1,10 +1,10 @@
-# cw_03
+# Group Pals Project 1 
 
-A new Flutter project.
+Youtube link: https://www.youtube.com/watch?v=XNhwttFBX5w
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project is a pet care game application that allows for users to simulate taking care of a pet! Launch build and play!
 
 A few resources to get you started if this is your first Flutter project:
 
